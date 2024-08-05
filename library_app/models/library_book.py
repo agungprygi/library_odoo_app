@@ -5,13 +5,35 @@ class Book(models.Model):
     _name = "library.book"
     _description = "Book"
 
+
+    #String Fields:
     name = fields.Char(string="Title", required=True)
     isbn = fields.Char(string="ISBN")
-    active = fields.Boolean(string="Active?", default=True)
+    book_type = fields.Selection([("paper", "Paperback"),
+                                  ("hard", "HardCover"),
+                                  ("electronic", "Electronic"), 
+                                  ("other", "Other")], string="Type")
+    notes = fields.Text(string="Internal Notes")
+    descr = fields.Html(string="Description")
+
+    #Numeric Fields:
+    copies = fields.Integer(default=1)
+    avg_rating = fields.Float("Average Rating", (3,2))
+    price = fields.Monetary(string="Price", currency_field="currency_id")
+    #price helper
+    currency_id = fields.Many2one("res.currency")
+
+    #date and time fields:
     date_published = fields.Date()
+    last_borrow_date = fields.Datetime(string="Last Borrowed On", default=lambda self:fields.Datetime.now())
+
+    #other field
+    active = fields.Boolean(string="Active?", default=True)
     image = fields.Binary(string="Cover")
+
+    #relational fields:
     publisher_id = fields.Many2one(comodel_name="res.partner", string="Publisher")
-    author_ids = fields.Many2many(comodel_name="res.partner", string="Author")
+    author_ids = fields.Many2many(comodel_name="res.partner", string="Authors")
 
     
     @api.depends('isbn')
