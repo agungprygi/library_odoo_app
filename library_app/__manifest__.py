@@ -6,7 +6,7 @@
     'category': 'Services/Library',
     'license' : 'AGPL-3',
     'website' : 'https://github.com/PacktPublishing/odoo-17-Development-Essentials',
-    'depends': ['base'],
+    'depends': ['base', 'web'],
 
     # always loaded
     'data': [
@@ -14,7 +14,8 @@
         'security/library_security.xml',
         'views/library_menu.xml',
         'views/book_view.xml',
-        'views/book_list_template.xml'
+        'views/book_list_template.xml',
+        "reports/library_book_report.xml"
     ],
     # only loaded in demonstration mode
     'demo': [
