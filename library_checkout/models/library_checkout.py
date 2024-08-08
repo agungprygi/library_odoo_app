@@ -26,33 +26,55 @@ class Checkout(models.Model):
     def _group_expand_stage_id(self, stages, domain, order):
         return stages.search([], order=order)
 
-    member_id = fields.Many2one("library.member", required=True)
     name = fields.Char(string="Title")
-    member_image = fields.Binary(related='member_id.image_128')
+    member_image = fields.Binary(related="member_id.image_128")
+
+    member_id = fields.Many2one("library.member", required=True)
     user_id = fields.Many2one("res.users", "Librarian", default=lambda s: s.env.user)
-    line_ids = fields.One2many("library.checkout.line", "checkout_id", string="Borrowed Books")
+    line_ids = fields.One2many(
+        "library.checkout.line",
+        "checkout_id",
+        string="Borrowed Books",
+    )
+
     request_date = fields.Date(
         default=lambda s: fields.Date.today(),
         compute="_compute_request_date_onchange",
         store=True,
-        readonly=False
-        )
+        readonly=False,
+    )
 
     stage_id = fields.Many2one(
-        "library.checkout.stage", 
-        default=_default_stage_id, 
+        "library.checkout.stage",
+        default=_default_stage_id,
+        copy=False,
         group_expand="_group_expand_stage_id")
-    state = fields.Selection(related='stage_id.state')
+    state = fields.Selection(related="stage_id.state")
+
+    kanban_state = fields.Selection([("normal", "In Progress"),
+                                     ("blocked", "Blocked"),
+                                     ("done", "Ready for next stage")], 
+                                     "Kanban State", 
+                                     default="normal")
+    color=fields.Integer()
+    priority = fields.Selection([("0", "High"),
+                                 ("1", "Very High"),
+                                 ("2", "Critical")], 
+                                 default="0")
 
     checkout_date = fields.Date(readonly=True)
     close_date = fields.Date(readonly=True)
 
-    count_checkouts = fields.Integer(compute="_compute_count_checkouts")
+    count_checkouts = fields.Integer(
+        compute="_compute_count_checkouts")
 
     def _compute_count_checkouts(self):
+        "Performance optimized, to run a single database query"
         members = self.mapped("member_id")
-        domain = [("member_id", "=", members.ids),
-                  ("state", "not in", ["done", "cancel"])]
+        domain = [
+            ("member_id", "in", members.ids),
+            ("state", "not in", ["done", "cancel"]),
+        ]
         raw = self.read_group(domain, ["id:count"], ["member_id"])
         data = {x["member_id"][0]: x["member_id_count"] for x in raw}
         for checkout in self:
@@ -60,7 +82,7 @@ class Checkout(models.Model):
 
     num_books = fields.Integer(compute="_compute_num_books", store=True)
 
-    @api.depends('line_ids')
+    @api.depends("line_ids")
     def _compute_num_books(self):
         for book in self:
             book.num_books = len(book.line_ids)
@@ -73,6 +95,10 @@ class Checkout(models.Model):
         return new_record
 
     def write(self, vals):
+        #reset kanban state when changing stage
+        if "stage_id" in vals and "kanban_state" not in vals:
+            vals["kanban_state"] = "normal"
+
         old_state = self.stage_id.state
         super().write(vals)
         new_state = self.stage_id.state

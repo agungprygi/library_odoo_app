@@ -7,7 +7,9 @@
       <tree
         decoration-muted="state in ['done','cancel']" decoration-bf="state=='open'"
       >
-        <button string="Send Messages" name="%(action_checkout_message)d" type="action" class="oe_highlight"/>
+        <header>
+          <button string="Send Messages" name="%(action_checkout_message)d" type="action" class="oe_highlight"/>
+        </header>
         <field name="name" />
         <field name="request_date" />
         <field name="member_id" />
@@ -86,17 +88,26 @@
     <field name="model">library.checkout</field>
     <field name="arch" type="xml">
       <search>
-        <field name="name" />
+  
+        <field name="name"/>
         <field name="member_id" />
         <field name="user_id" />
-        <filter name="filter_not_done" string="To Return" domain="[('state', '=', 'open')]" />
-        <filter name="filter_my_checkouts" string="My Checkouts" domain="[('user_id', '=', uid)]" />
-        <filter name="group_user" string="By Member" context="{'group_by': 'member_id'}" />
+        <filter name="filter_not_done"
+                string="To Return"
+                domain="[('state','=','open')]"/>
+        <filter name="filter_my_checkouts"
+                string="My Checkouts"
+                domain="[('user_id','=',uid)]"/>
+        <filter name="group_user"
+                string="By Member"
+                context="{'group_by': 'member_id'}"/>
+  
         <searchpanel>
-          <field name="member_id" enable_counters="1" />
-          <field name="stage_id" select="multi" />
+          <field name="stage_id" select="multi" enable_counters="1"/>
         </searchpanel>
+  
       </search>
+  
     </field>
   </record>
 
