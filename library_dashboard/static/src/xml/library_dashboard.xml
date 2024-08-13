@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Library Dashboard template -->
+<templates id="inventory_dashboard_template" xml:space="preserve">
+	<t t-name="LibraryDashboard" owl="1">
+		<h1>This Library Dashboard</h1>
+	</t>
+</templates>

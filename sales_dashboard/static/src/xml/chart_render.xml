@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Inventory Dashboard template -->
+<templates id="chart_template" xml:space="preserve">
+	<t t-name="ChartJSRenderer" owl="1">
+        <canvas t-ref='chart'/>
+    </t>
+</templates>
