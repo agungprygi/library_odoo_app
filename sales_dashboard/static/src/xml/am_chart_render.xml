@@ -2,6 +2,6 @@
 <!-- Inventory Dashboard template -->
 <templates id="chart_template" xml:space="preserve">
 	<t t-name="AmChartRenderer" owl="1">
-        <div t-ref="amChart" style="width:100%; height:500px;" ></div>
+        <div t-ref="amChart" style="width:100%; height:400px;" ></div>
     </t>
 </templates>
